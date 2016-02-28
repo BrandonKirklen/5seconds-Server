@@ -118,12 +118,12 @@ registerDevice deviceTable device =
         oldDeviceTable <- readTVar deviceTable
         let newDeviceTable = Map.insert (phoneNumber device) (uuid device) oldDeviceTable
         writeTVar deviceTable newDeviceTable
-        return newDeviceTable
+        return ()
 
 type InteractionAPI =
          Get Text
     :<|> "request" :> ReqBody Interaction :> Post [Interaction]
-    :<|> "register" :> ReqBody Device :> Post DeviceTable
+    :<|> "register" :> ReqBody Device :> Post ()
 
 interactionAPI :: Proxy InteractionAPI
 interactionAPI =
