@@ -123,7 +123,7 @@ registerDevice deviceTable device =
 type InteractionAPI =
          Get Text
     :<|> "request" :> ReqBody Interaction :> Post [Interaction]
-    :<|> "register" :> ReqBody Device :> Post [Interaction]
+    :<|> "register" :> ReqBody Device :> Post DeviceTable
 
 interactionAPI :: Proxy InteractionAPI
 interactionAPI =
