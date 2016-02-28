@@ -12,6 +12,35 @@ import System.IO
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
+import Data.Dates
+
+newtype LocationDegrees = LocationDegrees Double
+data LocationCoordinate = LocationCoordinate {
+    latitude :: LocationDegrees,
+    longitude :: LocationDegrees
+} 
+
+data Request = LocationRequest 
+             | ArrivalRequest LocationDegrees
+             | ChoiceRequest String String
+             | StatusRequest String
+             | VisualRequest
+
+data Choice = LeftChoice | RightChoice
+newtype ImageUploadId = ImageUploadId Int
+data Response = LocationResponse LocationCoordinate
+              | ArrivalResponse DateTime
+              | ChoiceResponse Choice
+              | StatusResponse Bool
+              | VisualResponse ImageUploadId
+
+newtype UserId = UserId Int
+data Interaction = Interaction { 
+    requesterId :: UserId, 
+    requestMessage :: Request,
+    responderId :: UserId,
+    responseMessage :: Response
+}
 
 newtype Note = Note
     { contents :: Text
