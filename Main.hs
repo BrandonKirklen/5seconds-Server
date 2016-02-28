@@ -69,19 +69,31 @@ data Interaction = RequestedInteraction {
 instance ToJSON Interaction
 instance FromJSON Interaction
 
+{- Phone Number -}
+newtype PhoneNumber = PhoneNumber String deriving (Generic, Show)
+instance ToJSON PhoneNumber
+instance FromJSON PhoneNumber
+
+{- UUID -}
+newtype UUID = UUID String deriving (Generic, Show)
+instance ToJSON UUID
+instance FromJSON UUID
+
 {- Device -}
 data Device = Device {
-  uuid :: Text,
-  phoneNumber :: Text
+  uuid :: UUID,
+  phoneNumber :: PhoneNumber
 } deriving (Generic, Show)
 instance ToJSON Device
 instance FromJSON Device
+
+type DeviceTable = Map.Map PhoneNumber UUID
 
 emptyQueue :: IO (TVar [Interaction])
 emptyQueue =
     newTVarIO []
 
-emptyDeviceTable :: IO (TVar (Map.Map Text Text))
+emptyDeviceTable :: IO (TVar DeviceTable)
 emptyDeviceTable =
     newTVarIO Map.empty
 
@@ -89,8 +101,8 @@ getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
 getQueue notes =
     liftIO $ readTVarIO notes
 
-postInteraction :: MonadIO m => TVar [Interaction] -> Interaction -> m [Interaction]
-postInteraction queue interaction =
+postRequest :: MonadIO m => TVar [Interaction] -> Interaction -> m [Interaction]
+postRequest queue interaction =
     liftIO $ do
       T.putStrLn $ (pack . show) interaction
       atomically $ do
@@ -99,7 +111,7 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
-registerDevice :: MonadIO m => TVar (Map.Map Int Text) -> Device -> m [Map.Map Int Text]
+registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m DeviceTable
 registerDevice deviceTable device =
     liftIO $ do
       atomically $ do
@@ -110,17 +122,17 @@ registerDevice deviceTable device =
 
 type InteractionAPI =
          Get Text
-    :<|> "action" :> ReqBody Interaction :> Post [Interaction]
+    :<|> "request" :> ReqBody Interaction :> Post [Interaction]
     :<|> "register" :> ReqBody Device :> Post [Interaction]
 
 interactionAPI :: Proxy InteractionAPI
 interactionAPI =
     Proxy
 
-server :: Text -> TVar [Interaction] -> TVar (Map.Map Int Text) -> Server InteractionAPI
+server :: Text -> TVar [Interaction] -> TVar DeviceTable -> Server InteractionAPI
 server home queue deviceTable =
          return home
-    :<|> postInteraction queue
+    :<|> postRequest queue
     :<|> registerDevice deviceTable
 
 main :: IO ()
