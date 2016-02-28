@@ -62,7 +62,7 @@ main = do
     hSetBuffering stdout LineBuffering
     env <- getEnvironment
     let port = maybe 8080 read $ lookup "PORT" env
-        home = maybe "Welcome 5seconds - Server" T.pack $
+        home = maybe "Welcome 5seconds - Server Teast" T.pack $
                  lookup "TUTORIAL_HOME" env
     notes <- emptyNotes
     run port $ serve noteAPI $ server home notes
