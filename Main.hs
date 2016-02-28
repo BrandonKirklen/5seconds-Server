@@ -13,6 +13,51 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
+- Degrees -}
+data LocationDegrees = LocationDegrees Double
+    deriving (Generic, Show)
+instance ToJSON LocationDegrees
+instance FromJSON LocationDegrees
+
+{- Coordinate -}
+data LocationCoordinate = LocationCoordinate {
+    latitude :: LocationDegrees,
+    longitude :: LocationDegrees
+} deriving (Generic, Show)
+instance ToJSON LocationCoordinate
+instance FromJSON LocationCoordinate
+
+{- Request -}
+data Request = LocationRequest 
+             | ArrivalRequest LocationCoordinate
+             | ChoiceRequest String String
+             | StatusRequest String
+             | VisualRequest
+             deriving (Generic, Show)
+instance ToJSON Request
+instance FromJSON Request
+
+{- Choice -}
+data Choice = LeftChoice | RightChoice deriving (Generic, Show)
+instance ToJSON Choice
+instance FromJSON Choice
+
+{- ImageUploadId -}
+newtype ImageUploadId = ImageUploadId Int deriving (Generic, Show)
+instance ToJSON ImageUploadId
+instance FromJSON ImageUploadId
+
+{- Response -}
+data Response = LocationResponse LocationCoordinate
+              | ArrivalResponse Int
+              | ChoiceResponse Choice
+              | StatusResponse Bool
+              | VisualResponse ImageUploadId
+              deriving (Generic, Show)
+instance ToJSON Response
+instance FromJSON Response
+
+
 {- Phone Number -}
 newtype PhoneNumber = PhoneNumber String deriving (Generic, Show, Ord, Eq)
 instance ToJSON PhoneNumber
