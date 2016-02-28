@@ -96,7 +96,7 @@ noteAPI :: Proxy NoteAPI
 noteAPI =
     Proxy
 
-server :: Text -> TVar [Note] -> Server NoteAPI
+server :: Text -> TVar [Interaction] -> Server NoteAPI
 server home notes =
          return home
     :<|> getQueue notes
@@ -110,5 +110,5 @@ main = do
     let port = maybe 8080 read $ lookup "PORT" env
         home = maybe "Welcome 5seconds - Server Test" T.pack $
                  lookup "TUTORIAL_HOME" env
-    notes <- emptyNotes
+    notes <- emptyQueue
     run port $ serve noteAPI $ server home notes
