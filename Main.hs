@@ -8,7 +8,7 @@ import Network.Wai.Handler.Warp
 import Servant
 import System.Environment
 import System.IO
-import qualified Data.Map.Strict as Map
+import Data.Map.Strict()
 
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
