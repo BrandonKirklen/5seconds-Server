@@ -56,16 +56,18 @@ getQueue notes =
 
 postRequest :: MonadIO m => TVar [Interaction] -> TVar DeviceTable -> Interaction -> m Bool
 postRequest queue deviceTable interaction =
-    do
+    liftIO $ do
       T.putStrLn $ (pack . show) interaction
-      liftIO $ atomically $ do
+      atomically $ do
         oldQueue <- readTVar queue
         let newQueue = interaction : oldQueue
         writeTVar queue newQueue
-      case lookup (toUser interaction) deviceTable of
-        Just uuid -> do print "hi"
-                        return True
-        Nothing -> return False
+      do
+        actualDeviceTable <- readTVar deviceTable
+        case Map.lookup (toUser interaction)  of
+          Just uuid -> do print "hi"
+                          return True
+          Nothing -> return False
 
 registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
