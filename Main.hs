@@ -54,7 +54,7 @@ getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
 getQueue notes =
     liftIO $ readTVarIO notes
 
-postRequest :: MonadIO m => TVar [Interaction] -> Interaction -> m [Interaction]
+postRequest :: MonadIO m => TVar [Interaction] -> TVar DeviceTable -> Interaction -> m Bool
 postRequest queue interaction =
     liftIO $ do
       T.putStrLn $ (pack . show) interaction
@@ -62,7 +62,10 @@ postRequest queue interaction =
         oldQueue <- readTVar queue
         let newQueue = interaction : oldQueue
         writeTVar queue newQueue
-        return newQueue
+      case lookup (toUser interaction) of
+        Just uuid -> do print "hi"
+                        return true
+        Nothing -> return false
 
 registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
@@ -75,7 +78,7 @@ registerDevice deviceTable device =
 
 type InteractionAPI =
          Get Text
-    :<|> "request" :> ReqBody Interaction :> Post [Interaction]
+    :<|> "request" :> ReqBody Interaction :> Post Bool
     :<|> "register" :> ReqBody Device :> Post ()
 
 interactionAPI :: Proxy InteractionAPI
@@ -85,7 +88,7 @@ interactionAPI =
 server :: Text -> TVar [Interaction] -> TVar DeviceTable -> Server InteractionAPI
 server home queue deviceTable =
          return home
-    :<|> postRequest queue
+    :<|> postRequest deviceTable queue
     :<|> registerDevice deviceTable
 
 main :: IO ()
