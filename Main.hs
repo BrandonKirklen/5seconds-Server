@@ -81,7 +81,7 @@ emptyQueue :: IO (TVar [Interaction])
 emptyQueue =
     newTVarIO []
 
-emptyDeviceTable :: IO (TVar (Map Text Text))
+emptyDeviceTable :: IO (TVar (Map.Map Text Text))
 emptyDeviceTable =
     newTVarIO Map.empty
 
@@ -99,7 +99,7 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
-registerDevice :: MonadIO m => TVar (Map Int Text) -> Device -> m [Map (Int Text)]
+registerDevice :: MonadIO m => TVar (Map.Map Int Text) -> Device -> m [Map.Map (Int Text)]
 registerDevice deviceTable device =
     liftIO $ do
       atomically $ do
@@ -117,7 +117,7 @@ interactionAPI :: Proxy InteractionAPI
 interactionAPI =
     Proxy
 
-server :: Text -> TVar [Interaction] -> TVar (Map Int Text) -> Server InteractionAPI
+server :: Text -> TVar [Interaction] -> TVar (Map.Map Int Text) -> Server InteractionAPI
 server home queue deviceTable =
          return home
     :<|> postInteraction queue
