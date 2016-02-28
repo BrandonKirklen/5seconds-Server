@@ -61,12 +61,11 @@ postRequest queue deviceTable interaction =
       atomically $ do
         oldQueue <- readTVar queue
         let newQueue = interaction : oldQueue
-        writeTVar queue newQueue
-      do
+        writeTVar queue newQueue)
         actualDeviceTable <- readTVar deviceTable
-        (case Map.lookup (toUser interaction)  of
+        case Map.lookup (toUser interaction)  of
           Just uuid -> return True
-          Nothing -> return False)
+          Nothing -> return False
 
 registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
