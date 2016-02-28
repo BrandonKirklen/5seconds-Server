@@ -75,38 +75,29 @@ data Interaction = Interaction {
 instance ToJSON Interaction
 instance FromJSON Interaction
 
-newtype Note = Note
-    { contents :: Text
-    }
-  deriving (Generic, Show)
-
-instance FromJSON Note
-instance ToJSON Note
-
-
-emptyNotes :: IO (TVar [Note])
-emptyNotes =
+emptyQueue :: IO (TVar [Interaction])
+emptyQueue =
     newTVarIO []
 
-getNotes :: MonadIO m => TVar [Note] -> m [Note]
-getNotes notes =
+getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
+getQueue notes =
     liftIO $ readTVarIO notes
 
-postNote :: MonadIO m => TVar [Note] -> Note -> m [Note]
-postNote notes note =
+postInteraction :: MonadIO m => TVar [Interaction] -> Interaction -> m [Interaction]
+postInteraction queue interaction =
     liftIO $ do
-      T.putStrLn $ contents note
+      T.putStrLn $ contents interaction
       atomically $ do
-        oldNotes <- readTVar notes
-        let newNotes = note : oldNotes
-        writeTVar notes newNotes
-        return newNotes
+        oldQueue <- readTVar queue
+        let newQueue = interaction : oldQueue
+        writeTVar queue newQueue
+        return newQueue
 
 
 type NoteAPI =
          Get Text
-    :<|> "notes" :> Get [Note]
-    :<|> "notes" :> ReqBody Note :> Post [Note]
+    :<|> "notes" :> Get [Interaction]
+    :<|> "notes" :> ReqBody Interaction :> Post [Interaction]
 
 noteAPI :: Proxy NoteAPI
 noteAPI =
@@ -115,8 +106,8 @@ noteAPI =
 server :: Text -> TVar [Note] -> Server NoteAPI
 server home notes =
          return home
-    :<|> getNotes notes
-    :<|> postNote notes
+    :<|> getQueue notes
+    :<|> postInteraction notes
 
 
 main :: IO ()
