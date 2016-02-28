@@ -69,9 +69,21 @@ data Interaction = RequestedInteraction {
 instance ToJSON Interaction
 instance FromJSON Interaction
 
+{- Device -}
+data Device = Device {
+  uuid :: Text,
+  phoneNumber :: Text
+} deriving (Generic, Show)
+instance ToJSON Device
+instance FromJSON Device
+
 emptyQueue :: IO (TVar [Interaction])
 emptyQueue =
     newTVarIO []
+
+emptyDeviceTable :: IO (TVar (Map Text Text))
+emptyDeviceTable =
+    newTVarIO empty
 
 getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
 getQueue notes =
@@ -87,18 +99,29 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
+registerDevice :: MonadIO m => TVar (Map Int Text) -> Device -> m [Map (Int Text)]
+registerDevice deviceTable device =
+    lifeIO $ do
+      atomically $ do
+        oldDeviceTable <- readTVar deviceTable
+        let newDeviceTable = Map.insert (phoneNumber device) (uuid device) oldDeviceTable
+        writeTVar deviceTable newDeviceTable
+        return newDeviceTable
+
 type InteractionAPI =
          Get Text
     :<|> "action" :> ReqBody Interaction :> Post [Interaction]
+    :<|> "register" :> ReqBody Device :> Post [Interaction]
 
 interactionAPI :: Proxy InteractionAPI
 interactionAPI =
     Proxy
 
-server :: Text -> TVar [Interaction] -> Server InteractionAPI
-server home queue =
+server :: Text -> TVar [Interaction] -> TVar (Map Int Text) -> Server InteractionAPI
+server home queue deviceTable =
          return home
     :<|> postInteraction queue
+    :<|> registerDevice deviceTable
 
 main :: IO ()
 main = do
@@ -108,4 +131,5 @@ main = do
         home = maybe "Welcome 5seconds - Server Test" T.pack $
                  lookup "TUTORIAL_HOME" env
     queue <- emptyQueue
-    run port $ serve interactionAPI $ server home queue
+    deviceTable <- emptyDeviceTable
+    run port $ serve interactionAPI $ server home queue deviceTable
