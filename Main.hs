@@ -61,7 +61,7 @@ postRequest queue deviceTable interaction =
       atomically $ do
         oldQueue <- readTVar queue
         let newQueue = interaction : oldQueue
-        writeTVar queue newQueue)
+        writeTVar queue newQueue
         actualDeviceTable <- readTVar deviceTable
         case Map.lookup (toUser interaction)  of
           Just uuid -> return True
