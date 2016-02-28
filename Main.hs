@@ -89,7 +89,7 @@ interactionAPI =
 server :: Text -> TVar [Interaction] -> TVar DeviceTable -> Server InteractionAPI
 server home queue deviceTable =
          return home
-    :<|> postRequest deviceTable queue
+    :<|> postRequest queue deviceTable
     :<|> registerDevice deviceTable
 
 main :: IO ()
