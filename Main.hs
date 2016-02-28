@@ -79,7 +79,7 @@ getQueue notes =
 postInteraction :: MonadIO m => TVar [Interaction] -> Interaction -> m [Interaction]
 postInteraction queue interaction =
     liftIO $ do
-      T.putStrLn $ contents interaction
+      T.putStrLn $ show interaction
       atomically $ do
         oldQueue <- readTVar queue
         let newQueue = interaction : oldQueue
