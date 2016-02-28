@@ -12,35 +12,68 @@ import System.IO
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
-import Data.Dates
+import Data.Aeson
+{-# LANGUAGE DeriveGeneric #-}
+import GHC.Generics
 
-newtype LocationDegrees = LocationDegrees Double
+{- Degrees -}
+data LocationDegrees = LocationDegrees Double
+    deriving (Generic, Show)
+instance ToJSON LocationDegrees
+instance FromJSON LocationDegrees
+
+{- Coordinate -}
 data LocationCoordinate = LocationCoordinate {
     latitude :: LocationDegrees,
     longitude :: LocationDegrees
-} 
+} deriving (Generic, Show)
+instance ToJSON LocationCoordinate
+instance FromJSON LocationCoordinate
 
+{- Request -}
 data Request = LocationRequest 
-             | ArrivalRequest LocationDegrees
+             | ArrivalRequest LocationCoordinate
              | ChoiceRequest String String
              | StatusRequest String
              | VisualRequest
+             deriving (Generic, Show)
+instance ToJSON Request
+instance FromJSON Request
 
-data Choice = LeftChoice | RightChoice
-newtype ImageUploadId = ImageUploadId Int
+{- Choice -}
+data Choice = LeftChoice | RightChoice deriving (Generic, Show)
+instance ToJSON Choice
+instance FromJSON Choice
+
+{- ImageUploadId -}
+newtype ImageUploadId = ImageUploadId Int deriving (Generic, Show)
+instance ToJSON ImageUploadId
+instance FromJSON ImageUploadId
+
+{- Response -}
 data Response = LocationResponse LocationCoordinate
-              | ArrivalResponse DateTime
+              | ArrivalResponse Int
               | ChoiceResponse Choice
               | StatusResponse Bool
               | VisualResponse ImageUploadId
+              deriving (Generic, Show)
+instance ToJSON Response
+instance FromJSON Response
 
-newtype UserId = UserId Int
+{- UserId -}
+newtype UserId = UserId Int deriving (Generic, Show)
+instance ToJSON UserId
+instance FromJSON UserId
+
+{- Interaction -}
 data Interaction = Interaction { 
     requesterId :: UserId, 
     requestMessage :: Request,
     responderId :: UserId,
     responseMessage :: Response
-}
+}  deriving (Generic, Show)
+instance ToJSON Interaction
+instance FromJSON Interaction
 
 newtype Note = Note
     { contents :: Text
