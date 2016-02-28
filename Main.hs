@@ -66,11 +66,8 @@ instance ToJSON UserId
 instance FromJSON UserId
 
 {- Interaction -}
-data Interaction = Interaction { 
-    requesterId :: UserId, 
-    requestMessage :: Request,
-    responderId :: UserId,
-    responseMessage :: Response
+data Interaction = RequestedInteraction { 
+    requesterId :: String
 }  deriving (Generic, Show)
 instance ToJSON Interaction
 instance FromJSON Interaction
