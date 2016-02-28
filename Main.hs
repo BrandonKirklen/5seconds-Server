@@ -54,8 +54,8 @@ getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
 getQueue notes =
     liftIO $ readTVarIO notes
 
-postRequest :: MonadIO m => TVar [Interaction] -> TVar DeviceTable -> Interaction -> m Bool
-postRequest queue deviceTable interaction =
+postInteraction :: MonadIO m => TVar [Interaction] -> TVar DeviceTable -> Interaction -> m Bool
+postInteraction queue deviceTable interaction =
     liftIO $ do
       T.putStrLn $ (pack . show) interaction
       atomically $ do
@@ -78,7 +78,7 @@ registerDevice deviceTable device =
 
 type InteractionAPI =
          Get Text
-    :<|> "request" :> ReqBody Interaction :> Post Bool
+    :<|> "interaction" :> ReqBody Interaction :> Post Bool
     :<|> "register" :> ReqBody Device :> Post ()
 
 interactionAPI :: Proxy InteractionAPI
@@ -88,7 +88,7 @@ interactionAPI =
 server :: Text -> TVar [Interaction] -> TVar DeviceTable -> Server InteractionAPI
 server home queue deviceTable =
          return home
-    :<|> postRequest queue deviceTable
+    :<|> postInteraction queue deviceTable
     :<|> registerDevice deviceTable
 
 main :: IO ()
