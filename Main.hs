@@ -111,7 +111,7 @@ postRequest queue interaction =
         writeTVar queue newQueue
         return newQueue
 
-registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m DeviceTable
+registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
     liftIO $ do
       atomically $ do
