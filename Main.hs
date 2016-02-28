@@ -83,7 +83,7 @@ emptyQueue =
 
 emptyDeviceTable :: IO (TVar (Map Text Text))
 emptyDeviceTable =
-    newTVarIO empty
+    newTVarIO Map.empty
 
 getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
 getQueue notes =
