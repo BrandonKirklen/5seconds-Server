@@ -13,7 +13,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
-- Degrees -}
+{- Degrees -}
 data LocationDegrees = LocationDegrees Double
     deriving (Generic, Show)
 instance ToJSON LocationDegrees
