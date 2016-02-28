@@ -19,5 +19,4 @@ executable haskell-on-heroku-tutorial
                       stm,
                       text,
                       transformers,
-                      warp,
-                      dates
+                      warp
