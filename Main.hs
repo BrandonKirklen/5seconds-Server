@@ -87,8 +87,6 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
-registerDevice :: MonadIO m => TVar [Devices]
-
 type InteractionAPI =
          Get Text
     :<|> "action" :> ReqBody Interaction :> Post [Interaction]
