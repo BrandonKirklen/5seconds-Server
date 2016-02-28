@@ -101,7 +101,7 @@ postInteraction queue interaction =
 
 registerDevice :: MonadIO m => TVar (Map Int Text) -> Device -> m [Map (Int Text)]
 registerDevice deviceTable device =
-    lifeIO $ do
+    liftIO $ do
       atomically $ do
         oldDeviceTable <- readTVar deviceTable
         let newDeviceTable = Map.insert (phoneNumber device) (uuid device) oldDeviceTable
