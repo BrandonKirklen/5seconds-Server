@@ -87,21 +87,20 @@ postInteraction queue interaction =
         return newQueue
 
 
-type NoteAPI =
+type InteractionAPI =
          Get Text
-    :<|> "notes" :> Get [Interaction]
-    :<|> "notes" :> ReqBody Interaction :> Post [Interaction]
+    :<|> "action" :> Get [Interaction]
+    :<|> "action" :> ReqBody Interaction :> Post [Interaction]
 
-noteAPI :: Proxy NoteAPI
-noteAPI =
+interactionAPI :: Proxy InteractionAPI
+interactionAPI =
     Proxy
 
-server :: Text -> TVar [Interaction] -> Server NoteAPI
-server home notes =
+server :: Text -> TVar [Interaction] -> Server InteractionAPI
+server home queue =
          return home
-    :<|> getQueue notes
-    :<|> postInteraction notes
-
+    :<|> getQueue queue
+    :<|> postInteraction queue
 
 main :: IO ()
 main = do
@@ -110,5 +109,5 @@ main = do
     let port = maybe 8080 read $ lookup "PORT" env
         home = maybe "Welcome 5seconds - Server Test" T.pack $
                  lookup "TUTORIAL_HOME" env
-    notes <- emptyQueue
-    run port $ serve noteAPI $ server home notes
+    queue <- emptyQueue
+    run port $ serve interactionAPI $ server home queue
