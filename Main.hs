@@ -23,14 +23,14 @@ newtype UUID = UUID String deriving (Generic, Show)
 instance ToJSON UUID
 instance FromJSON UUID
 
-{- Interaction -}
-data Interaction = Interaction { 
+{- RequestInteraction -}
+data RequestInteraction = RequestInteraction { 
     fromUser :: PhoneNumber,
     toUser :: PhoneNumber,
-    blob :: Value
+    request :: Request
 }  deriving (Generic, Show)
-instance ToJSON Interaction
-instance FromJSON Interaction
+instance ToJSON RequestInteraction
+instance FromJSON RequestInteraction
 
 {- Device -}
 data Device = Device {
@@ -42,7 +42,7 @@ instance FromJSON Device
 
 type DeviceTable = Map.Map PhoneNumber UUID
 
-emptyQueue :: IO (TVar [Interaction])
+emptyQueue :: IO (TVar [RequestInteraction])
 emptyQueue =
     newTVarIO []
 
@@ -50,12 +50,12 @@ emptyDeviceTable :: IO (TVar DeviceTable)
 emptyDeviceTable =
     newTVarIO Map.empty
 
-getQueue :: MonadIO m => TVar [Interaction] -> m [Interaction]
+getQueue :: MonadIO m => TVar [RequestInteraction] -> m [RequestInteraction]
 getQueue notes =
     liftIO $ readTVarIO notes
 
-postInteraction :: MonadIO m => TVar [Interaction] -> TVar DeviceTable -> Interaction -> m Bool
-postInteraction queue deviceTable interaction =
+postRequest :: MonadIO m => TVar [RequestInteraction] -> TVar DeviceTable -> RequestInteraction -> m Bool
+postRequest queue deviceTable interaction =
     liftIO $ do
       T.putStrLn $ (pack . show) interaction
       atomically $ do
@@ -78,17 +78,17 @@ registerDevice deviceTable device =
 
 type InteractionAPI =
          Get Text
-    :<|> "interaction" :> ReqBody Interaction :> Post Bool
+    :<|> "request" :> ReqBody RequestInteraction :> Post Bool
     :<|> "register" :> ReqBody Device :> Post ()
 
 interactionAPI :: Proxy InteractionAPI
 interactionAPI =
     Proxy
 
-server :: Text -> TVar [Interaction] -> TVar DeviceTable -> Server InteractionAPI
+server :: Text -> TVar [RequestInteraction] -> TVar DeviceTable -> Server InteractionAPI
 server home queue deviceTable =
          return home
-    :<|> postInteraction queue deviceTable
+    :<|> postRequest queue deviceTable
     :<|> registerDevice deviceTable
 
 main :: IO ()
