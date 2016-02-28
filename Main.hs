@@ -12,10 +12,6 @@ import System.IO
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
-import Data.Aeson
-{-# LANGUAGE DeriveGeneric #-}
-import GHC.Generics
-
 {- Degrees -}
 data LocationDegrees = LocationDegrees Double
     deriving (Generic, Show)
