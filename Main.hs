@@ -64,8 +64,8 @@ postRequest queue interaction =
         writeTVar queue newQueue
       case lookup (toUser interaction) of
         Just uuid -> do print "hi"
-                        return true
-        Nothing -> return false
+                        return True
+        Nothing -> return False
 
 registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
