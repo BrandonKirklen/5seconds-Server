@@ -99,7 +99,7 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
-registerDevice :: MonadIO m => TVar (Map.Map Int Text) -> Device -> m [Map.Map (Int Text)]
+registerDevice :: MonadIO m => TVar (Map.Map Int Text) -> Device -> m [Map.Map Int Text]
 registerDevice deviceTable device =
     liftIO $ do
       atomically $ do
