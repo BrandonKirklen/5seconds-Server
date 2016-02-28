@@ -8,6 +8,7 @@ import Network.Wai.Handler.Warp
 import Servant
 import System.Environment
 import System.IO
+import qualified Data.Map.Strict as Map
 
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -86,10 +87,10 @@ postInteraction queue interaction =
         writeTVar queue newQueue
         return newQueue
 
+registerDevice :: MonadIO m => TVar [Devices]
 
 type InteractionAPI =
          Get Text
-    :<|> "action" :> Get [Interaction]
     :<|> "action" :> ReqBody Interaction :> Post [Interaction]
 
 interactionAPI :: Proxy InteractionAPI
@@ -99,7 +100,6 @@ interactionAPI =
 server :: Text -> TVar [Interaction] -> Server InteractionAPI
 server home queue =
          return home
-    :<|> getQueue queue
     :<|> postInteraction queue
 
 main :: IO ()

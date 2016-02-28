@@ -19,4 +19,5 @@ executable haskell-on-heroku-tutorial
                       stm,
                       text,
                       transformers,
-                      warp
+                      warp,
+                      containers
