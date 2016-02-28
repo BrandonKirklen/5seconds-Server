@@ -70,7 +70,7 @@ instance ToJSON Interaction
 instance FromJSON Interaction
 
 {- Phone Number -}
-newtype PhoneNumber = PhoneNumber String deriving (Generic, Show, Ord)
+newtype PhoneNumber = PhoneNumber String deriving (Generic, Show, Ord, Eq)
 instance ToJSON PhoneNumber
 instance FromJSON PhoneNumber
 
