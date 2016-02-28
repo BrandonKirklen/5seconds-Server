@@ -64,10 +64,9 @@ postRequest queue deviceTable interaction =
         writeTVar queue newQueue
       do
         actualDeviceTable <- readTVar deviceTable
-        case Map.lookup (toUser interaction)  of
-          Just uuid -> do print "hi"
-                          return True
-          Nothing -> return False
+        (case Map.lookup (toUser interaction)  of
+          Just uuid -> return True
+          Nothing -> return False)
 
 registerDevice :: MonadIO m => TVar DeviceTable -> Device -> m ()
 registerDevice deviceTable device =
